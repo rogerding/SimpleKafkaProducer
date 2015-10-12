@@ -33,11 +33,23 @@ public class BufferedFileReader implements Runnable
         {
             try
             {
+                // Creates a buffering character-input stream that uses a default-sized input buffer.
                 rd = new BufferedReader(new FileReader(this.fileToRead));
-                wd = new BufferedWriter(new OutputStreamWriter(
-                    this.outputStream, ENC));
+                // Creates a buffered character-output stream that uses a default-sized output buffer.
+                // BufferedWriter(Writer out)
+                wd = new BufferedWriter(
+                        // An OutputStreamWriter is a bridge from character streams to byte streams:
+                        // Characters written to it are encoded into bytes using a specified charset.
+                        // Creates an OutputStreamWriter that uses the given charset.
+                        // OutputStreamWriter(OutputStream out, Charset cs)
+                        new OutputStreamWriter(this.outputStream, ENC)
+                );
                 int b = -1;
                 LOGGER.debug("Reading stream");
+
+                // Reads a single character.
+                // Returns: The character read, as an integer in the range 0 to 65535 (0x00-0xffff),
+                // or -1 if the end of the stream has been reached
                 while ((b = rd.read()) != -1)
                 {
                     wd.write(b);

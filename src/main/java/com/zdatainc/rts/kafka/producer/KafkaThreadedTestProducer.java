@@ -28,18 +28,24 @@ public class KafkaThreadedTestProducer
         try
         {
             LOGGER.debug("Setting up streams");
+
+            // Creates a PipedInputStream so that it is not yet connected and uses the specified pipe size for the pipe's buffer.
             PipedInputStream send = new PipedInputStream(BUFFER_LEN);
-            PipedOutputStream input = new PipedOutputStream(send);
+            // Creates a piped output stream connected to the specified piped input stream.
+            // Here: connect fileReaderOutput to Kafka's send
+            PipedOutputStream fileReaderOutput = new PipedOutputStream(send);
 
             LOGGER.debug("Setting up connections");
             LOGGER.debug("Setting up file reader");
-            BufferedFileReader reader = new BufferedFileReader(filename, input);
+            // BufferedFileReader's output is Kafka's input
+            BufferedFileReader reader = new BufferedFileReader(filename, fileReaderOutput);
+
             LOGGER.debug("Setting up kafka producer");
-            KafkaProducer kafkaProducer = new KafkaProducer(topic, send);
+            MyKafkaProducer myKafkaProducer = new MyKafkaProducer(topic, send);
 
             LOGGER.debug("Spinning up threads");
             Thread source = new Thread(reader);
-            Thread kafka = new Thread(kafkaProducer);
+            Thread kafka = new Thread(myKafkaProducer);
 
             source.start();
             kafka.start();
